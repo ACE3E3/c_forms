@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sauce Input Form</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      /* CLEAR tomato sauce image */
+      background:
+        linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)),
+        url('https://images.unsplash.com/photo-1604908554265-04f3b14f7c29');
+
+      background-size: cover;
+      background-position: center;
+    }
+
+    .form-container {
+      width: 420px;
+      padding: 28px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      color: #fff;
+      animation: fadeIn 0.8s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    label {
+      display: block;
+      margin-top: 14px;
+      font-size: 14px;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      margin-top: 6px;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      font-size: 15px;
+    }
+
+    input[type="number"]:focus {
+      box-shadow: 0 0 0 2px #ff6f61;
+    }
+
+    button {
+      margin-top: 26px;
+      width: 100%;
+      padding: 14px;
+      border-radius: 30px;
+      border: none;
+      background: linear-gradient(135deg, #c62828, #ff7043);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.25);
+    }
+
+    .emoji {
+      text-align: center;
+      font-size: 28px;
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-container">
+    <div class="emoji">🍅🥫🌶️</div>
+    <h2>Sauce Submission</h2>
+
+    <form id="dataForm">
+      <input type="hidden" name="area" value="Sauce">
+      <label>Total Requested Quantity (kg)</label>
+      <input type="number" name="requested_qty" min="0" step="0.01" required>
+
+      <label>Production Quantity (kg)</label>
+      <input type="number" name="production_qty" min="0" step="0.01" required>
+
+      <label>Wastage Quantity (kg)</label>
+      <input type="number" name="wastage_qty" min="0" step="0.01">
+
+      <label>Opening Stock (kg)</label>
+      <input type="number" name="opening_stock" min="0" step="0.01" required>
+
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+
+  <script>
+    const form = document.getElementById('dataForm');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      try {
+        // Decode API URL from Base64
+        const encodedUrl = 'aHR0cDovL2xvY2FsaG9zdDo4MDAwL2FwaS9mb3Jtcy9zdWJtaXQ=';
+        const apiUrl = atob(encodedUrl);
+        
+        // Collect form data
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData);
+        
+        // Submit via fetch
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        if (response.ok) {
+          alert('Submission successful!');
+          form.reset();
+        } else {
+          alert('Submission failed. Please try again.');
+        }
+      } catch (error) {
+        alert('Error submitting form: ' + error.message);
+      }
+    });
+  </script>
+
+</body>
+</html>
