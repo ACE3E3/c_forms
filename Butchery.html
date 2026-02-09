@@ -18,9 +18,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-
-      /* Poultry (cooked chicken) background */
-      background: url('https://cdn.pixabay.com/photo/2017/08/02/01/01/kebab-2571499_1280.jpg') no-repeat center center; /* replace with a cooked poultry image url */
+      background: url('https://cdn.pixabay.com/photo/2017/08/02/01/01/kebab-2571499_1280.jpg') no-repeat center center;
       background-size: cover;
     }
 
@@ -28,7 +26,7 @@
       width: 420px;
       padding: 28px;
       border-radius: 16px;
-      background: rgba(0, 0, 0, 0.45); /* semi-transparent card to keep text readable */
+      background: rgba(0, 0, 0, 0.45);
       color: #fff;
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
@@ -38,6 +36,36 @@
       margin-bottom: 20px;
       font-weight: 600;
       letter-spacing: 1px;
+    }
+
+    .notification {
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      text-align: center;
+      font-weight: 500;
+      display: none;
+    }
+
+    .notification.success {
+      background-color: rgba(76, 175, 80, 0.3);
+      border: 1px solid #4caf50;
+      color: #c8e6c9;
+      display: block;
+    }
+
+    .notification.error {
+      background-color: rgba(244, 67, 54, 0.3);
+      border: 1px solid #f44336;
+      color: #ffcdd2;
+      display: block;
+    }
+
+    .notification.warning {
+      background-color: rgba(255, 193, 7, 0.3);
+      border: 1px solid #ffc107;
+      color: #ffe0b2;
+      display: block;
     }
 
     label {
@@ -60,6 +88,11 @@
       box-shadow: 0 0 0 2px #d29a5c;
     }
 
+    input[type="number"]:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+    }
+
     button {
       margin-top: 26px;
       width: 100%;
@@ -71,21 +104,57 @@
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
+      transition: all 0.3s ease;
     }
 
-    button:hover {
+    button:hover:not(:disabled) {
       transform: translateY(-2px);
       box-shadow: 0 10px 20px rgba(0,0,0,0.25);
+    }
+
+    button:disabled {
+      background: #666;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 20px;
+      font-size: 14px;
+    }
+
+    .spinner {
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 3px solid #fff;
+      width: 32px;
+      height: 32px;
+      animation: spin 1s linear infinite;
+      margin: 10px auto;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
 <body>
 
   <div class="form-container">
+    <div id="notification" class="notification"></div>
     <h2>Poultry Submission</h2>
 
-    <form id="dataForm">
+    <div id="loadingContent" class="loading" style="display: none;">
+      <div class="spinner"></div>
+      <p>Validating access...</p>
+    </div>
+
+    <form id="dataForm" style="display: none;">
       <input type="hidden" name="area" value="Butchery">
+      <input type="hidden" id="tokenField" name="token" value="">
+      
       <label>Total Requested Quantity (kg)</label>
       <input type="number" name="requested_qty" min="0" step="0.01" required>
 
@@ -98,41 +167,110 @@
       <label>Opening Stock (kg)</label>
       <input type="number" name="opening_stock" min="0" step="0.01" required>
 
-      <button type="submit">Submit</button>
+      <button id="submitBtn" type="submit">Submit</button>
     </form>
   </div>
 
   <script>
+    const encodedUrl = 'aHR0cDovL2xvY2FsaG9zdDo4MDAwL2FwaS9mb3Jtcy9zdWJtaXQ=';
+    const API_BASE = atob(encodedUrl).replace('/submit', '');
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+
     const form = document.getElementById('dataForm');
+    const loadingContent = document.getElementById('loadingContent');
+    const notification = document.getElementById('notification');
+    const tokenField = document.getElementById('tokenField');
+    const submitBtn = document.getElementById('submitBtn');
+    const formInputs = form.querySelectorAll('input[type="number"]');
+
+    async function validateToken() {
+      try {
+        loadingContent.style.display = 'block';
+        form.style.display = 'none';
+        notification.style.display = 'none';
+
+        if (!token) {
+          showNotification('No access token provided. Please use the link sent to you.', 'error');
+          loadingContent.style.display = 'none';
+          return;
+        }
+
+        const response = await fetch(`${API_BASE}/validate-token?token=${encodeURIComponent(token)}`);
+        const result = await response.json();
+        loadingContent.style.display = 'none';
+
+        if (!result.success || !result.data.valid) {
+          showNotification('Invalid or expired token. The submission window has closed.', 'error');
+          return;
+        }
+
+        if (result.data.submitted) {
+          showNotification('Compliance Form For Today has been submitted.', 'success');
+          form.style.display = 'block';
+          disableAllInputs();
+          return;
+        }
+
+        tokenField.value = token;
+        form.style.display = 'block';
+        showNotification('Form loaded successfully. Please fill in the details.', 'warning');
+
+      } catch (error) {
+        loadingContent.style.display = 'none';
+        showNotification('Error validating access: ' + error.message, 'error');
+        console.error('Token validation error:', error);
+      }
+    }
+
+    function showNotification(message, type) {
+      notification.textContent = message;
+      notification.className = 'notification ' + type;
+      notification.style.display = 'block';
+    }
+
+    function disableAllInputs() {
+      formInputs.forEach(input => {
+        input.disabled = true;
+      });
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Already Submitted';
+    }
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      
       try {
-        // Decode API URL from Base64
-        const encodedUrl = 'aHR0cDovL2xvY2FsaG9zdDo4MDAwL2FwaS9mb3Jtcy9zdWJtaXQ=';
-        const apiUrl = atob(encodedUrl);
-        
-        // Collect form data
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+
         const formData = new FormData(form);
         const data = Object.fromEntries(formData);
-        
-        // Submit via fetch
-        const response = await fetch(apiUrl, {
+
+        const response = await fetch(`${API_BASE}/submit`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)
         });
-        
-        if (response.ok) {
-          alert('Submission successful!');
-          form.reset();
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          showNotification('✓ Submission successful!', 'success');
+          disableAllInputs();
+          submitBtn.textContent = 'Submitted';
         } else {
-          alert('Submission failed. Please try again.');
+          showNotification(result.message || 'Submission failed. Please try again.', 'error');
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Submit';
         }
       } catch (error) {
-        alert('Error submitting form: ' + error.message);
+        showNotification('Error submitting form: ' + error.message, 'error');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Submit';
       }
     });
+
+    validateToken();
   </script>
 
 </body>
