@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alert Comment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            max-width: 900px;
+            width: 100%;
+            padding: 32px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .notification {
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .notification.error {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+            display: block;
+        }
+
+        .notification.success {
+            background: #efe;
+            border: 1px solid #cfc;
+            color: #3c3;
+            display: block;
+        }
+
+        .notification.warning {
+            background: #fef3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            display: block;
+        }
+
+        .alert-details {
+            margin-bottom: 32px;
+            display: none;
+        }
+
+        .alert-details.show {
+            display: block;
+        }
+
+        .alert-details h2 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #f9f9f9;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .details-table th,
+        .details-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .details-table th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+            width: 180px;
+        }
+
+        .details-table td {
+            color: #333;
+            word-break: break-word;
+        }
+
+        .details-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comment-section {
+            display: none;
+        }
+
+        .comment-section.show {
+            display: block;
+        }
+
+        .comment-section h2 {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+            font-size: 14px;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea:disabled {
+            background: #f5f5f5;
+            cursor: not-allowed;
+            color: #999;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-submit {
+            background: #667eea;
+            color: white;
+            flex: 1;
+            max-width: 200px;
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-submit:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .submitted-message {
+            text-align: center;
+            color: #3c3;
+            font-size: 16px;
+            padding: 20px;
+            background: #efe;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .submitted-message.show {
+            display: block;
+        }
+
+        .error-message {
+            text-align: center;
+            color: #c33;
+            font-size: 16px;
+            padding: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 16px;
+            }
+
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .details-table th,
+            .details-table td {
+                padding: 8px;
+                font-size: 12px;
+            }
+
+            .details-table th {
+                width: 100px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn-submit {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📝 Alert Comment</h1>
+            <p>Please review the alert details and add your comments</p>
+        </div>
+
+        <div id="notification" class="notification"></div>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Validating alert access...</p>
+        </div>
+
+        <div id="alertDetails" class="alert-details">
+            <h2>Alert Details</h2>
+            <table class="details-table">
+                <tbody id="alertTable"></tbody>
+            </table>
+        </div>
+
+        <div id="commentSection" class="comment-section">
+            <h2>Add Your Comment</h2>
+            <form id="commentForm">
+                <div class="form-group">
+                    <label for="comment">Your Comment</label>
+                    <textarea id="comment" name="comment" placeholder="Please enter your comments and observations about this alert..." required></textarea>
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="btn-submit" id="submitBtn">Submit Comment</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="submittedMessage" class="submitted-message">
+            ✓ Your comment has been submitted successfully. Thank you!
+        </div>
+
+        <div id="errorMessage" class="error-message"></div>
+    </div>
+
+    <script>
+        // Detect API base URL based on the current host
+        let API_BASE_URL;
+        
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            // Local development
+            API_BASE_URL = 'http://localhost:8000';
+        } else if (window.location.hostname === 'ace3e3.github.io') {
+            // GitHub Pages - use production backend
+            // Change this to your production server IP or domain
+            API_BASE_URL = 'http://cc-alerts-backend.local:8000'; // Update with your server IP/domain
+        } else {
+            // Default to the same host as the current page
+            API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:8000`;
+        }
+        
+        console.log('API Base URL:', API_BASE_URL);
+
+        async function validateToken() {
+            const params = new URLSearchParams(window.location.search);
+            const token = params.get('token');
+
+            if (!token) {
+                showError('No token provided. Invalid link.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/alerts/validate-comment-token?token=${encodeURIComponent(token)}`);
+                const result = await response.json();
+
+                if (!result.success) {
+                    showError(result.message || 'Invalid or expired token');
+                    return;
+                }
+
+                if (result.data.submitted) {
+                    document.getElementById('loading').style.display = 'none';
+                    document.getElementById('submittedMessage').classList.add('show');
+                    document.getElementById('commentSection').classList.add('show');
+                    document.getElementById('comment').disabled = true;
+                    document.getElementById('submitBtn').disabled = true;
+                    showNotification('This alert comment has already been submitted.', 'warning');
+                    return;
+                }
+
+                // Display alert details
+                displayAlertDetails(result.data.alert);
+                document.getElementById('alertDetails').classList.add('show');
+                document.getElementById('commentSection').classList.add('show');
+                document.getElementById('loading').style.display = 'none';
+
+                // Store token for submission
+                document.getElementById('commentForm').dataset.token = token;
+                document.getElementById('commentForm').dataset.alertId = result.data.alert.id;
+            } catch (error) {
+                showError(`Error validating token: ${error.message}`);
+            }
+        }
+
+        function displayAlertDetails(alert) {
+            const tableBody = document.getElementById('alertTable');
+            tableBody.innerHTML = '';
+
+            const fields = [
+                { label: 'Alert ID', value: alert.id },
+                { label: 'Area', value: alert.source_area },
+                { label: 'Summary', value: alert.summary },
+                { label: 'Details', value: alert.details },
+                { label: 'Status', value: alert.status },
+                { label: 'Assigned To', value: alert.assigned_username },
+                { label: 'Fetched At', value: new Date(alert.fetched_at).toLocaleString() },
+                { label: 'Created At', value: new Date(alert.created_at).toLocaleString() }
+            ];
+
+            fields.forEach(field => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <th>${field.label}</th>
+                    <td>${field.value || 'N/A'}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        async function submitComment(event) {
+            event.preventDefault();
+
+            const token = document.getElementById('commentForm').dataset.token;
+            const alertId = document.getElementById('commentForm').dataset.alertId;
+            const comment = document.getElementById('comment').value.trim();
+
+            if (!comment) {
+                showNotification('Please enter a comment', 'error');
+                return;
+            }
+
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('submitBtn').textContent = 'Submitting...';
+
+            try {
+                const formData = new FormData();
+                formData.append('alert_id', alertId);
+                formData.append('comment', comment);
+                formData.append('token', token);
+
+                const response = await fetch(`${API_BASE_URL}/api/alerts/submit-comment`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (!result.success) {
+                    showNotification(result.message || 'Failed to submit comment', 'error');
+                    document.getElementById('submitBtn').disabled = false;
+                    document.getElementById('submitBtn').textContent = 'Submit Comment';
+                    return;
+                }
+
+                // Success
+                document.getElementById('commentForm').style.display = 'none';
+                document.getElementById('submittedMessage').classList.add('show');
+                showNotification('Comment submitted successfully!', 'success');
+            } catch (error) {
+                showError(`Error submitting comment: ${error.message}`);
+                document.getElementById('submitBtn').disabled = false;
+                document.getElementById('submitBtn').textContent = 'Submit Comment';
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+        }
+
+        function showError(message) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('errorMessage').textContent = `❌ ${message}`;
+            document.getElementById('errorMessage').style.display = 'block';
+        }
+
+        // Initialize
+        document.getElementById('commentForm').addEventListener('submit', submitComment);
+        validateToken();
+    </script>
+</body>
+</html>
