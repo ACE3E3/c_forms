@@ -323,24 +323,29 @@
     <script>
         // Detect API base URL based on the current host
         let API_BASE_URL;
+        const urlParams = new URLSearchParams(window.location.search);
         
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            // Local development
-            API_BASE_URL = 'http://localhost:8000';
-        } else if (window.location.hostname === 'ace3e3.github.io') {
-            // GitHub Pages - use production backend
-            // Change this to your production server IP or domain
-            API_BASE_URL = 'http://cc-alerts-backend.local:8000'; // Update with your server IP/domain
+        // Check if API URL is provided as query parameter
+        const apiParam = urlParams.get('api');
+        if (apiParam) {
+            // Use the provided API URL
+            API_BASE_URL = decodeURIComponent(apiParam);
         } else {
             // Default to the same host as the current page
             API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:8000`;
         }
         
+        console.log('=== Alert Comment Form Loaded ===');
         console.log('API Base URL:', API_BASE_URL);
+        console.log('Form URL:', window.location.href);
+        console.log('Hostname:', window.location.hostname);
 
         async function validateToken() {
             const params = new URLSearchParams(window.location.search);
             const token = params.get('token');
+
+            console.log('=== Starting Token Validation ===');
+            console.log('Token received:', token ? token.substring(0, 20) + '...' : 'NONE');
 
             if (!token) {
                 showError('No token provided. Invalid link.');
@@ -348,13 +353,23 @@
             }
 
             try {
-                const response = await fetch(`${API_BASE_URL}/api/alerts/validate-comment-token?token=${encodeURIComponent(token)}`);
+                const validateUrl = `${API_BASE_URL}/api/alerts/validate-comment-token?token=${encodeURIComponent(token)}`;
+                console.log('Validation URL:', validateUrl);
+                console.log('Fetching token validation...');
+                
+                const response = await fetch(validateUrl);
+                console.log('Response status:', response.status);
+                
                 const result = await response.json();
+                console.log('Validation result:', result);
 
                 if (!result.success) {
                     showError(result.message || 'Invalid or expired token');
+                    console.error('Token validation failed:', result.message);
                     return;
                 }
+
+                console.log('✓ Token valid, displaying alert details');
 
                 if (result.data.submitted) {
                     document.getElementById('loading').style.display = 'none';
@@ -363,6 +378,7 @@
                     document.getElementById('comment').disabled = true;
                     document.getElementById('submitBtn').disabled = true;
                     showNotification('This alert comment has already been submitted.', 'warning');
+                    console.log('Alert already submitted');
                     return;
                 }
 
@@ -376,7 +392,8 @@
                 document.getElementById('commentForm').dataset.token = token;
                 document.getElementById('commentForm').dataset.alertId = result.data.alert.id;
             } catch (error) {
-                showError(`Error validating token: ${error.message}`);
+                console.error('Error during validation:', error);
+                showError(`Error validating token: ${error.message}. Check browser console for details. Backend URL: ${API_BASE_URL}`);
             }
         }
 

@@ -174,9 +174,20 @@
   </div>
 
   <script>
-    const encodedUrl = 'aHR0cDovL2xvY2FsaG9zdDo4MDAwL2FwaS9mb3Jtcy9zdWJtaXQ=';
-    const API_BASE = atob(encodedUrl).replace('/submit', '');
     const urlParams = new URLSearchParams(window.location.search);
+    const apiParam = urlParams.get('api');
+    
+    // Determine API base
+    let API_BASE;
+    if (apiParam) {
+      // Use provided API URL
+      API_BASE = decodeURIComponent(apiParam);
+    } else {
+      // Fallback to encoded URL
+      const encodedUrl = 'aHR0cDovL2xvY2FsaG9zdDo4MDAwL2FwaS9mb3Jtcy9zdWJtaXQ=';
+      API_BASE = atob(encodedUrl).replace('/submit', '');
+    }
+    
     const token = urlParams.get('token');
 
     const form = document.getElementById('dataForm');
