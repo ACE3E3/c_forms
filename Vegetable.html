@@ -204,8 +204,15 @@
     // Determine API base
     let API_BASE;
     if (apiParam) {
-      // Use provided API URL
-      API_BASE = decodeURIComponent(apiParam);
+      // Use provided API URL and ensure it uses http:// for private IP addresses
+      let decodedUrl = decodeURIComponent(apiParam);
+      // If it's a protocol-relative URL (//...) or https://..., convert to http:// for private IPs
+      if (decodedUrl.startsWith('//')) {
+        decodedUrl = 'http:' + decodedUrl;
+      } else if (decodedUrl.startsWith('https://')) {
+        decodedUrl = decodedUrl.replace('https://', 'http://');
+      }
+      API_BASE = decodedUrl;
     } else {
       // Fallback to encoded URL
       const encodedUrl = 'aHR0cDovL2xvY2FsaG9zdDo4MDAwL2FwaS9mb3Jtcy9zdWJtaXQ=';
@@ -233,8 +240,19 @@
           return;
         }
 
-        const response = await fetch(`${API_BASE}/validate-token?token=${encodeURIComponent(token)}`);
+        console.log('🔍 Debug Info:');
+        console.log('API_BASE:', API_BASE);
+        console.log('Token:', token.substring(0, 20) + '...');
+        
+        const validateUrl = `${API_BASE}/api/forms/validate-token?token=${encodeURIComponent(token)}`;
+        console.log('Fetch URL:', validateUrl);
+        console.log('Starting fetch...');
+        
+        const response = await fetch(validateUrl);
+        console.log('Response received. Status:', response.status);
+        
         const result = await response.json();
+        console.log('Parsed JSON:', result);
         loadingContent.style.display = 'none';
 
         if (!result.success || !result.data.valid) {
@@ -255,8 +273,12 @@
 
       } catch (error) {
         loadingContent.style.display = 'none';
+        console.error('❌ Token validation failed!');
+        console.error('Error type:', error.constructor.name);
+        console.error('Error message:', error.message);
+        console.error('Full error:', error);
+        console.error('Stack trace:', error.stack);
         showNotification('Error validating access: ' + error.message, 'error');
-        console.error('Token validation error:', error);
       }
     }
 
@@ -283,7 +305,7 @@
         const formData = new FormData(form);
         const data = Object.fromEntries(formData);
 
-        const response = await fetch(`${API_BASE}/submit`, {
+        const response = await fetch(`${API_BASE}/api/forms/submit`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data)

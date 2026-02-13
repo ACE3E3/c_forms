@@ -328,8 +328,15 @@
         // Check if API URL is provided as query parameter
         const apiParam = urlParams.get('api');
         if (apiParam) {
-            // Use the provided API URL
-            API_BASE_URL = decodeURIComponent(apiParam);
+            // Use the provided API URL and ensure it uses http:// for private IP addresses
+            let decodedUrl = decodeURIComponent(apiParam);
+            // If it's a protocol-relative URL (//...) or https://..., convert to http:// for private IPs
+            if (decodedUrl.startsWith('//')) {
+                decodedUrl = 'http:' + decodedUrl;
+            } else if (decodedUrl.startsWith('https://')) {
+                decodedUrl = decodedUrl.replace('https://', 'http://');
+            }
+            API_BASE_URL = decodedUrl;
         } else {
             // Default to the same host as the current page
             API_BASE_URL = `${window.location.protocol}//${window.location.hostname}:8000`;
