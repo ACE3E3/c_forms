@@ -169,7 +169,6 @@
 
   <div class="form-container">
     <div id="notification" class="notification"></div>
-    <div id="debugInfo" style="display:none; background: rgba(0,0,0,0.7); border: 1px solid #666; padding: 10px; margin-bottom: 10px; border-radius: 8px; font-size: 12px; color: #aaa; font-family: monospace; word-break: break-all; max-height: 200px; overflow-y: auto;"></div>
     <div class="emoji">🥦🍅🥕</div>
     <h2>Production Submission</h2>
 
@@ -199,48 +198,19 @@
   </div>
 
   <script>
-    // Debug display function
-    const debugElement = document.getElementById('debugInfo');
-    const debugMessages = [];
-    
-    function addDebugLog(msg) {
-      debugMessages.push(msg);
-      console.log(msg);
-      debugElement.style.display = 'block';
-      debugElement.innerHTML = debugMessages.join('<br>');
-      debugElement.scrollTop = debugElement.scrollHeight;
-    }
-    
     const urlParams = new URLSearchParams(window.location.search);
     const apiParam = urlParams.get('api');
-    
-    addDebugLog('📍 Page loaded');
-    addDebugLog('api param: ' + (apiParam ? apiParam.substring(0, 30) + '...' : 'NONE'));
     
     // Determine API base
     let API_BASE;
     if (apiParam) {
-      // Use provided API URL and ensure it uses http:// for private IP addresses
-      let decodedUrl = decodeURIComponent(apiParam);
-      addDebugLog('decoded: ' + decodedUrl);
-      
-      // If it's a protocol-relative URL (//...) or https://..., convert to http:// for private IPs
-      if (decodedUrl.startsWith('//')) {
-        decodedUrl = 'http:' + decodedUrl;
-        addDebugLog('converted // to http://');
-      } else if (decodedUrl.startsWith('https://')) {
-        decodedUrl = decodedUrl.replace('https://', 'http://');
-        addDebugLog('converted https:// to http://');
-      }
-      API_BASE = decodedUrl;
+      // Use provided API URL as-is (backend controls protocol based on environment)
+      API_BASE = decodeURIComponent(apiParam);
     } else {
       // Fallback to encoded URL
       const encodedUrl = 'aHR0cDovL2xvY2FsaG9zdDo4MDAwL2FwaS9mb3Jtcy9zdWJtaXQ=';
       API_BASE = atob(encodedUrl).replace('/submit', '');
-      addDebugLog('Using fallback API_BASE');
     }
-    
-    addDebugLog('✓ API_BASE: ' + API_BASE);
     
     const token = urlParams.get('token');
 
@@ -263,25 +233,14 @@
           return;
         }
 
-        addDebugLog('🔄 Validating token...');
-        const validateUrl = `${API_BASE}/api/forms/validate-token?token=${encodeURIComponent(token)}`;
-        addDebugLog('URL: ' + validateUrl.substring(0, 60) + '...');
-        
-        const response = await fetch(validateUrl);
-        addDebugLog('✓ Response: ' + response.status);
-        
+        const response = await fetch(`${API_BASE}/api/forms/validate-token?token=${encodeURIComponent(token)}`);
         const result = await response.json();
-        addDebugLog('✓ Parsed JSON');
-        
         loadingContent.style.display = 'none';
 
         if (!result.success || !result.data.valid) {
-          addDebugLog('❌ Token invalid: ' + result.message);
-          showNotification('Invalid or expired token. The submission window has closed.', 'error');
+          showNotification('Invalid or expired token. Form submission closed.', 'error');
           return;
         }
-        
-        addDebugLog('✓ Token valid!');
 
         if (result.data.submitted) {
           showNotification('Compliance Form For Today has been submitted.', 'success');
@@ -296,10 +255,8 @@
 
       } catch (error) {
         loadingContent.style.display = 'none';
-        addDebugLog('❌ ERROR: ' + error.message);
-        addDebugLog('Type: ' + error.constructor.name);
         showNotification('Error validating access: ' + error.message, 'error');
-        console.error('Full error:', error);
+        console.error('Token validation error:', error);
       }
     }
 
@@ -324,12 +281,10 @@
         submitBtn.textContent = 'Submitting...';
 
         const formData = new FormData(form);
-        const data = Object.fromEntries(formData);
 
         const response = await fetch(`${API_BASE}/api/forms/submit`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
+          body: formData
         });
 
         const result = await response.json();
