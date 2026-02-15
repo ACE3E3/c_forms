@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CC Alerts - Support & Help</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px 20px;
+        }
+        
+        section {
+            margin-bottom: 40px;
+        }
+        
+        section h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        section p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+            color: #555;
+        }
+        
+        .feature-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+        
+        .feature-list li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+        
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .contact-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            margin-top: 30px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+        
+        .contact-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+        
+        .email-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 15px;
+        }
+        
+        .email-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #777;
+            font-size: 0.9em;
+            border-top: 1px solid #eee;
+        }
+        
+        @media (max-width: 600px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            section h2 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>CC Alerts</h1>
+            <p>Real-time Alert Management & Compliance</p>
+        </header>
+        
+        <div class="content">
+            <section>
+                <h2>About CC Alerts</h2>
+                <p>
+                    CC Alerts is an internal real-time alert management system designed for your organization to monitor critical events, manage compliance requirements, and ensure seamless communication across teams.
+                </p>
+                <p>
+                    This is a private application with restricted access. It provides instant alerts, detailed tracking, compliance form management, and real-time data synchronization to streamline operations and keep your team informed.
+                </p>
+            </section>
+            
+            <section>
+                <h2>Key Features</h2>
+                <ul class="feature-list">
+                    <li>Real-time alert notifications with live data updates</li>
+                    <li>Comprehensive alert history and tracking</li>
+                    <li>Compliance form distribution and response management</li>
+                    <li>Integration with Telegram for instant messaging alerts</li>
+                    <li>Secure authentication and role-based access control</li>
+                    <li>KPI dashboards with real-time metrics and analytics</li>
+                    <li>Multi-area support with area-specific data isolation</li>
+                    <li>Automated scheduling for data processing and compliance tasks</li>
+                    <li>WebSocket support for live data synchronization</li>
+                    <li>Mobile-optimized interface for on-the-go access</li>
+                </ul>
+            </section>
+            
+            <section>
+                <h2>How It Works</h2>
+                <p>
+                    CC Alerts monitors your systems and automatically generates alerts based on predefined triggers. These alerts are sent in real-time to users through the app and Telegram notifications. Users can review alert details including metadata, original data rows, and associated information.
+                </p>
+                <p>
+                    <strong>Alert Management:</strong> Users can view alerts in different states (New, Under Review, Justified), add detailed comments, and take actions. Justification forms are automatically generated and can be submitted through the app or via linked forms.
+                </p>
+                <p>
+                    <strong>Compliance Tracking:</strong> Compliance forms are distributed on a schedule and track user responses. Form submissions are validated and stored for audit purposes.
+                </p>
+                <p>
+                    <strong>Data Sync:</strong> The app uses WebSocket connections to receive live updates for alerts, metrics, and KPI data. All data is synced with your area and user credentials.
+                </p>
+            </section>
+            
+            <section>
+                <h2>Getting Started</h2>
+                <p>
+                    You have been granted access to CC Alerts. Open the app using the provided link and sign in with your credentials. Your account is configured for your specific area, so you'll only see alerts and data relevant to your role.
+                </p>
+                <p>
+                    <strong>First Time:</strong> Log in with your credentials. You'll see your dashboard with current alerts, KPIs, and assigned compliance forms.
+                </p>
+                <p>
+                    <strong>Key Sections:</strong>
+                </p>
+                <ul class="feature-list">
+                    <li><strong>Home/Dashboard:</strong> Overview of current alerts and metrics</li>
+                    <li><strong>Alerts:</strong> View all alerts with filtering by status (New, Under Review, Justified)</li>
+                    <li><strong>Alert Details:</strong> Click any alert to view full details, metadata, and original data rows</li>
+                    <li><strong>Actions:</strong> Add comments, justify alerts, or submit forms</li>
+                    <li><strong>Compliance Forms:</strong> Receive and respond to compliance forms as scheduled</li>
+                </ul>
+            </section>
+            
+            <section class="contact-section">
+                <h3>Need Help?</h3>
+                <p>
+                    Have questions or need support? We're here to help! Reach out to us via email and we'll get back to you as soon as possible.
+                </p>
+                <a href="mailto:zaidmhd57@gmail.com" class="email-link">
+                    📧 Contact Support
+                </a>
+                <p style="margin-top: 20px; font-size: 0.95em;">
+                    Email: <strong>zaidmhd57@gmail.com</strong>
+                </p>
+            </section>
+        </div>
+        
+        <footer>
+            <p>&copy; 2026 CC Alerts. All rights reserved.</p>
+            <p>Version 2.0.0</p>
+        </footer>
+    </div>
+</body>
+</html>
